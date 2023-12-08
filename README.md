@@ -6,3 +6,7 @@
 
 # Schedule Notification
 
+![Screenshot_20231208-143611](https://github.com/mzunohkaru/Flutter-Sample-Awesome-Notification/assets/99012157/e3ba26fd-b164-4c18-86ed-b18a838ccee6)
+
+
+![Screenshot_20231208-143615](https://github.com/mzunohkaru/Flutter-Sample-Awesome-Notification/assets/99012157/ee56303d-e792-4f7b-89b7-a13704a45bfc)
