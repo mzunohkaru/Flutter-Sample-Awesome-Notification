@@ -23,7 +23,8 @@ class NotificationController {
         [
           // 通知チャンネルを作成
           NotificationChannel(
-              channelKey: 'alerts',
+              // channelKey: 'alerts',
+              channelKey: 'basic_channel',
               channelName: 'Alerts',
               channelDescription: 'Notification tests as alerts',
               playSound: true,
@@ -34,6 +35,11 @@ class NotificationController {
               defaultColor: Colors.deepPurple,
               ledColor: Colors.deepPurple)
         ],
+        // channelGroups: [
+        //   NotificationChannelGroup(
+        //       channelGroupKey: 'basic_channel_group',
+        //       channelGroupName: 'Basic Group')
+        // ],
         debug: true);
 
     // 通知の初期アクションを取得
@@ -80,9 +86,6 @@ class NotificationController {
           'Message sent via notification input: "${receivedAction.buttonKeyInput}"');
       await executeLongTaskInBackground();
     } else {
-      // this process is only necessary when you need to redirect the user
-      // to a new page or use a valid context, since parallel isolates do not
-      // have valid context, so you need redirect the execution to main isolate
       if (receivePort == null) {
         print(
             'onActionReceivedMethod was called inside a parallel dart isolate.');
@@ -171,6 +174,7 @@ class NotificationController {
             ],
           );
         });
+    // 通知送信の許可を要求する
     return userAuthorized &&
         await AwesomeNotifications().requestPermissionToSendNotifications();
   }
@@ -196,6 +200,7 @@ class NotificationController {
   ///新しい通知を作成
   ///ユーザーが通知を許可している場合のみ、通知が作成されます
   static Future<void> createNewNotification() async {
+    // 通知の送信が許可されているか判定
     bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
     if (!isAllowed) isAllowed = await displayNotificationRationale();
     if (!isAllowed) return;
@@ -204,24 +209,23 @@ class NotificationController {
         content: NotificationContent(
             id: -1, // -1 is replaced by a random number
             channelKey: 'alerts',
-            title: 'Huston! The eagle has landed!',
-            body:
-                "A small step for a man, but a giant leap to Flutter's community!",
-            bigPicture: 'https://storage.googleapis.com/cms-storage-bucket/d406c736e7c4c57f5f61.png',
-            largeIcon: 'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
-            //'asset://assets/images/balloons-in-sky.jpg',
+            title: '通知のタイトル',
+            body: "ここには、通知のボディーメッセージを記述する。",
+            bigPicture:
+                'https://storage.googleapis.com/cms-storage-bucket/d406c736e7c4c57f5f61.png',
+            largeIcon: 'asset://assets/person.png',
             notificationLayout: NotificationLayout.BigPicture,
             payload: {'notificationId': '1234567890'}),
         actionButtons: [
-          NotificationActionButton(key: 'REDIRECT', label: 'Redirect'),
+          NotificationActionButton(key: 'REDIRECT', label: 'リダイレクト'),
           NotificationActionButton(
               key: 'REPLY',
-              label: 'Reply Message',
+              label: 'リプレイ メッセージ',
               requireInputText: true,
               actionType: ActionType.SilentAction),
           NotificationActionButton(
               key: 'DISMISS',
-              label: 'Dismiss',
+              label: '拒否',
               actionType: ActionType.DismissAction,
               isDangerousOption: true)
         ]);
@@ -229,17 +233,18 @@ class NotificationController {
 
   // 新しい通知をスケジュール
   static Future<void> scheduleNewNotification() async {
+    // 通知の送信が許可されているか判定
     bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
     if (!isAllowed) isAllowed = await displayNotificationRationale();
     if (!isAllowed) return;
 
     await myNotifyScheduleInHours(
-        title: 'test',
-        msg: 'test message',
+        title: '通知スケジュール　タイトル',
+        msg: '通知スケジュール　メッセージ',
         heroThumbUrl:
             'https://storage.googleapis.com/cms-storage-bucket/d406c736e7c4c57f5f61.png',
         hoursFromNow: 1,
-        username: 'test user',
+        username: '通知スケジュール　ユーザー',
         repeatNotif: true);
   }
 
@@ -265,16 +270,19 @@ Future<void> myNotifyScheduleInHours({
 }) async {
   var nowDate = DateTime.now().add(Duration(hours: hoursFromNow, seconds: 5));
   await AwesomeNotifications().createNotification(
-    schedule: NotificationCalendar(
-      //weekday: nowDate.day,
-      hour: nowDate.hour,
-      minute: 1,
-      second: nowDate.second,
-      repeats: repeatNotif,
-      //allowWhileIdle: true,
+    // schedule: NotificationCalendar(
+    //   //weekday: nowDate.day,
+    //   hour: nowDate.hour,
+    //   minute: 1,
+    //   second: nowDate.second,
+    //   repeats: repeatNotif,
+    //   //allowWhileIdle: true,
+    // ),
+    schedule: NotificationCalendar.fromDate(
+      date: DateTime.now().add(
+        const Duration(seconds: 10),
+      ),
     ),
-    // schedule: NotificationCalendar.fromDate(
-    //    date: DateTime.now().add(const Duration(seconds: 10))),
     content: NotificationContent(
       id: -1,
       channelKey: 'basic_channel',
@@ -282,7 +290,7 @@ Future<void> myNotifyScheduleInHours({
       body: '$username, $msg',
       bigPicture: heroThumbUrl,
       notificationLayout: NotificationLayout.BigPicture,
-      //actionType : ActionType.DismissAction,
+      actionType: ActionType.DismissAction,
       color: Colors.black,
       backgroundColor: Colors.black,
       // customSound: 'resource://raw/notif',
@@ -291,11 +299,11 @@ Future<void> myNotifyScheduleInHours({
     actionButtons: [
       NotificationActionButton(
         key: 'NOW',
-        label: 'btnAct1',
+        label: 'ボタン　1',
       ),
       NotificationActionButton(
         key: 'LATER',
-        label: 'btnAct2',
+        label: 'ボタン　2',
       ),
     ],
   );
