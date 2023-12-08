@@ -232,13 +232,14 @@ class NotificationController {
   }
 
   // 新しい通知をスケジュール
-  static Future<void> scheduleNewNotification() async {
+  static Future<void> scheduleNewNotification(DateTime setDate) async {
     // 通知の送信が許可されているか判定
     bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
     if (!isAllowed) isAllowed = await displayNotificationRationale();
     if (!isAllowed) return;
 
     await myNotifyScheduleInHours(
+        setDate: setDate,
         title: '通知スケジュール　タイトル',
         msg: '通知スケジュール　メッセージ',
         heroThumbUrl:
@@ -260,6 +261,46 @@ class NotificationController {
 }
 
 // 指定した時間後に通知をスケジュールします
+Future myNotifyScheduleInHours({
+  required DateTime setDate,
+  required int hoursFromNow,
+  required String heroThumbUrl,
+  required String username,
+  required String title,
+  required String msg,
+  bool repeatNotif = false,
+}) async {
+  await AwesomeNotifications().createNotification(
+    schedule: NotificationCalendar.fromDate(date: setDate),
+    content: NotificationContent(
+      id: -1,
+      channelKey: 'basic_channel',
+      title: '${Emojis.food_bowl_with_spoon} $title',
+      body: '$username, $msg',
+      bigPicture: heroThumbUrl,
+      notificationLayout: NotificationLayout.BigPicture,
+      actionType: ActionType.DismissAction,
+      color: Colors.black,
+      backgroundColor: Colors.black,
+      // customSound: 'resource://raw/notif',
+      payload: {'actPag': 'myAct', 'actType': 'food', 'username': username},
+    ),
+    actionButtons: [
+      NotificationActionButton(
+        key: 'NOW',
+        label: 'ボタン　1',
+      ),
+      NotificationActionButton(
+        key: 'LATER',
+        label: 'ボタン　2',
+      ),
+    ],
+  );
+}
+
+
+/*
+
 Future<void> myNotifyScheduleInHours({
   required int hoursFromNow,
   required String heroThumbUrl,
@@ -308,3 +349,5 @@ Future<void> myNotifyScheduleInHours({
     ],
   );
 }
+
+*/
